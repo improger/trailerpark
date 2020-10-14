@@ -107,8 +107,7 @@ public class MainController {
     @GetMapping("/all")
     public String all(Model model) {
         model.addAttribute("title", "Glavnaja stranica");
-      //  Iterable<Trailer> trailers = trailerRepository.findAll(Sort.by("outDate").ascending());
-        // model.addAttribute("trailers", trailers);
+     
         return "all.html";
     }
 
@@ -117,9 +116,7 @@ public class MainController {
     public String trlAdd (@RequestParam String inTrl, @RequestParam  Date inDate, @RequestParam String dep, @RequestParam String inTruck, @RequestParam String inName, @RequestParam String inLname, @RequestParam String status, @RequestParam String email, Model model) throws ParseException {
 
 
-    /*    java.util.Date utilDate = new SimpleDateFormat("dd-MM-yyyy").parse(inDate);
-        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-*/
+
 
 
 
@@ -181,8 +178,7 @@ public class MainController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = authentication.getName();
 
-       // java.util.Date utilDate = new SimpleDateFormat("dd-MM-yyyy").parse(outDate);
-       // java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+  
 
         if(trailer.getOutTrc()!=null){
             System.out.println("Out truck is: "+trailer.getOutTrc());
@@ -303,44 +299,11 @@ public class MainController {
 
     }
 
-  /*  @RequestMapping(value = "/loadtype", params = "export", method = RequestMethod.POST)
-//    public String export (Model model, @RequestParam Date datefrom, Date dateto){
-
-
-        public void downloadCsv(HttpServletResponse response, Model model, @RequestParam Date datefrom, Date dateto) throws IOException {
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=Report.xlsx");
-
-        ByteArrayInputStream stream = ExcelFileExporter.contactListToExcelFile(createTestData(datefrom, dateto));
-        IOUtils.copy(stream, response.getOutputStream());
-    }
-
-    private List<Trailer> createTestData(Date datefrom, Date dateto){
-        // public Trailer(String trl, String inTrc, String inName, String inLname, String department, Date inDate)
-        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-        Date date = new Date(System.currentTimeMillis());
-
-
-        Iterable<Trailer> trailers = trailerRepository.findTop1000ByInDateBetweenOrderByInDateDesc(datefrom, dateto);
-        List<Trailer> trl = new ArrayList<>();
-        trailers.forEach(trl::add);
-
-        System.out.println("======Method EXPORT called======");
-        return trl;
-
-    } */
 
     @RequestMapping(value = "/loadtype", params = "load", method = RequestMethod.POST)
    public String load (Model model, @RequestParam Date datefrom, Date dateto ) throws ParseException {
 
-       /* java.util.Date utilDateFrom = new SimpleDateFormat("dd-MM-yyyy").parse(datefrom);
-        java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
-
-        java.util.Date utilDateTo = new SimpleDateFormat("dd-MM-yyyy").parse(dateto);
-        java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
-
-
-*/
+      
 
 
 
@@ -387,11 +350,6 @@ public class MainController {
     public String trlEditDep (@RequestParam Long id, @RequestParam Date outDate, @RequestParam String dep, @RequestParam String trl, @RequestParam String outTruck, @RequestParam String outName, @RequestParam String outLname, @RequestParam String email, Model model) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = authentication.getName();
-/*
-        java.util.Date utilDate = new SimpleDateFormat("dd-MM-yyyy").parse(outDate);
-        java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-
-*/
 
         Trailer trailer = trailerRepository.findById(id).orElseThrow(() -> new Exception("TRAILER not found"));
 
