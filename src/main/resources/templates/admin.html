@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>JPT parking</title>
+
+    <!-- BOOTSTRAP JQUERRY -->
+    <script th:src="@{/js/jquery.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/popper.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/bootstrap.min.js}" type="text/javascript"></script>
+
+
+
+    <!-- BOOTSTRAP CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+
+    <!--Datatables CSS-->
+    <link th:href="@{/css/dataTables.bootstrap4.min.css}" rel="stylesheet">
+    <link th:href="@{/css/rowReorder.bootstrap4.min.css}" rel="stylesheet">
+    <link th:href="@{/css/responsive.bootstrap4.min.css}" rel="stylesheet">
+    <link th:href="@{/css/fixedHeader.bootstrap4.min.css}" rel="stylesheet">
+
+
+
+
+    <style type="text/css" class="init">
+
+    </style>
+
+    <style>
+        .modalInput{
+            min-width: 200px ;
+            text-transform:uppercase;
+
+        }
+
+
+        .tblRow {
+            text-transform:uppercase
+        }
+
+        .hdn{
+            display: none;
+        }
+
+        *{padding:0;margin:0;}
+
+        .svg {
+            width:40px;
+            height:40px;
+
+        }
+
+
+        .float{
+            position:fixed;
+            width:60px;
+            height:60px;
+            bottom:40px;
+            right:40px;
+            background-color:#007BFF;
+            color:#FFF;
+            border-radius:50px;
+            text-align:center;
+            box-shadow: 2px 2px 3px #999;
+            padding-left: 10px;
+            padding-top: 10px;
+
+        }
+
+        .my-float{
+
+        }
+
+    </style>
+
+    <!--Datatables JQUERRY-->
+
+    <script th:src="@{/js/moment.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/jquery.dataTables.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/datetime-moment.js}" type="text/javascript"></script>
+
+
+    <!--<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>-->
+    <script th:src="@{/js/dataTables.bootstrap4.min.js}" type="text/javascript"></script>
+
+    <script th:src="@{/js/dataTables.rowReorder.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/dataTables.responsive.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/dataTables.fixedHeader.min.js}" type="text/javascript"></script>
+
+
+
+    <script type="text/javascript" class="init">
+
+
+
+        $(document).ready(function() {
+
+
+
+
+
+
+            //SEARCH
+
+            oTable = $('#myTable').dataTable();
+
+            $('#searchbox').on('keyup change', function(){
+                oTable.api().search($(this).val()).draw();
+            });
+
+
+
+// Button Edit Departure
+            $("#myTable").on('click','.btnEditDep',function(){
+
+                alert('click');
+                var table = $('#myTable').DataTable();
+                var tr = $(this.closest('tr'));
+                if(tr.hasClass('child')){
+                    tr = tr.prev();
+                }
+                var rowData = table.row(tr).data();
+
+                var date = moment(rowData.outDate).format('YYYY-MM-DD');
+
+
+
+                console.log(rowData);
+                document.getElementById("id").value = rowData.id;
+                document.getElementById("depTrl").value = rowData.trl;
+                document.getElementById("outTrc").value = rowData.outTrc;
+                document.getElementById("outName").value = rowData.outName;
+                document.getElementById("outLname").value = rowData.outLname;
+                document.getElementById("outDate").value = date;
+                document.getElementById("outDep").value = rowData.outDepartment;
+
+
+                $('#modalEditDep').modal('show');
+
+            });
+
+
+
+
+
+
+
+// Button Remove Dep pass
+            $("#myTable").on('click','.btnDepDel',function(){
+                alert("Click");
+                var table = $('#myTable').DataTable();
+                var tr = $(this.closest('tr'));
+                if(tr.hasClass('child')){
+                    tr = tr.prev();
+                }
+                var rowData = table.row(tr).data();
+
+
+
+                document.getElementById("removeDepId").value = rowData.id;
+                document.getElementById("removeDepTrc").value = rowData.outTrc;
+                document.getElementById("removeDepTrl").innerHTML = "<Strong>"+rowData.trl+"</Strong>";
+
+
+                console.log("Trailer ID: "+rowData.id+"\nTrailer Name: "+rowData.outTrc );
+
+
+                $('#modalRemoveDep').modal('show')
+            });
+
+//Refresh table
+
+            setInterval( function () {
+                $('#myTable').DataTable().ajax.reload();
+
+                console.log("TABLE RELOADED")
+            }, 120000 );
+
+
+
+
+
+
+        } );
+
+
+
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body id="page-top">
+
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <div class="container" >
+        <!-- <a class="navbar-brand js-scroll-trigger" href="#page-top">JPT Parking</a> -->
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/arrived">On Parking
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" href="/depart">Departed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/all">All</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+
+<div>
+
+</div>
+
+<!-- TABLE -->
+
+
+
+
+    <div class="container-sm" style="min-height: 87vh; max-width: 60vh">
+
+   <div style="padding-top: 80px; padding-bottom: 20px">
+        <a class="btn btn-primary btn-sm active" role="button" data-toggle="modal" data-target="#exampleModalAdd" aria-pressed="true">
+
+            + Add new User
+
+        </a>
+   </div>
+
+        <!-- Table -->
+        <table id="example" class="table table-sm table-striped table-bordered table-hover">
+            <thead class=" thead-dark">
+            <tr>
+                <!-- <th scope="col">#</th> -->
+                <th scope="col">Id</th>
+                <th scope="col">Username</th>
+                <th scope="col">Password</th>
+                <th scope="col">Role</th>
+                <th scope="col">Act</th>
+            </tr>
+            </thead>
+            <tbody >
+            <tr th:each="el : ${users}">
+                <!--<th scope="row"><h5 th:text="${el.id}"/> </th> -->
+                <td><h6  th:text="${el.id}"/> </td>
+                <td><h6  th:text="${el.username}"/> </td>
+                <td><h6  th:text="${el.password}"/> </td>
+                <td><h6  th:text="${el.role}"/> </td>
+
+
+                <td style="text-align: center">
+
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" >
+
+
+
+
+                        <div class="dropdown-divider"></div>
+
+
+                        <a class="dropdown-item" data-toggle="modal" th:data-target="${'#exampleModalEdit'+el.id}" >
+                            <svg class="bi bi-pencil-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15.502 1.94a.5.5 0 010 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 01.707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 00-.121.196l-.805 2.414a.25.25 0 00.316.316l2.414-.805a.5.5 0 00.196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 002.5 15h11a1.5 1.5 0 001.5-1.5v-6a.5.5 0 00-1 0v6a.5.5 0 01-.5.5h-11a.5.5 0 01-.5-.5v-11a.5.5 0 01.5-.5H9a.5.5 0 000-1H2.5A1.5 1.5 0 001 2.5v11z" clip-rule="evenodd"/>
+                            </svg>
+
+                            Edit</a>
+
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div>
+
+                        <a class="dropdown-item" data-toggle="modal" th:data-target="${'#exampleModalRemoveArr'+el.id}" > <svg class="bi bi-x-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="red" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm9.854 4.854a.5.5 0 00-.708-.708L8 7.293 4.854 4.146a.5.5 0 10-.708.708L7.293 8l-3.147 3.146a.5.5 0 00.708.708L8 8.707l3.146 3.147a.5.5 0 00.708-.708L8.707 8l3.147-3.146z" clip-rule="evenodd"/>
+                        </svg> Remove</a>
+
+
+
+
+                    </div>
+                </td>
+
+            </tr>
+
+
+
+
+            <!-- Modal EDIT  -->
+            <div th:each="el : ${users}" class="modal fade" th:id="${'exampleModalEdit'+el.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelEdit" aria-hidden="true" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabelEdit">Edit user</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="text-align: left">
+                            <form class="form" id="editArrForm" method="post" action="/edituser" >
+
+
+                                <input pattern="[A-Za-z]+"   class="form-control" type="text" name="id" th:value="${el.id}" readonly hidden >
+
+
+                                <div class="form-group row">
+                                    <label for="editusername" class="col-sm-3 col-form-label" >Username</label>
+                                    <div class="col-sm-4">
+                                        <input pattern="[A-Za-z]+"  id="editusername"  class="form-control-sm" type="text" name="username" th:placeholder="Username" th:value="${el.username}" required readonly>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <label for="editpassword" class="col-sm-3 col-form-label" >Password</label>
+                                    <div class="col-sm-4">
+                                        <input id="editpassword" class="form-control-sm" type="text" name="password" th:placeholder="Password" th:value="${el.password}" required >
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group row">
+                                    <label for="editrole" class="col-sm-3 col-form-label" >Role</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control-sm" id="editrole" name="role" th:placeholder="Department" th:value="${el.role}"  required >
+                                            <option value="" disabled selected>Select Role</option>
+                                            <option>User</option>
+                                            <option>Admin</option>
+
+
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <button type="submit" class="btn btn-primary" >Save changes</button>
+
+
+
+                                <div class="modal-footer">
+
+                                </div>
+
+                            </form>
+
+
+
+
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal REMOVE  -->
+            <div th:each="el : ${users}" class="modal fade" th:id="${'exampleModalRemoveArr'+el.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelRemoveArr" aria-hidden="true" data-backdrop="false">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabelRemoveArr">Remove User ?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form" method="post" action="/removeuser">
+                                <input class="form-control" type="text" name="id" th:value="${el.id}" readonly hidden >
+                                <input  class="form-control" type="text" name="username" th:value="${el.username}" readonly hidden >
+
+                                <p class="text-left">Are you sure want to remove user: <span th:text="${el.username}"></span>  <span> ???</span></p>
+
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary" >Remove</button>
+                            </form>
+
+
+
+
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            </tbody>
+
+        </table>
+
+
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+</div>
+
+
+
+<!-- Footer -->
+<footer class="py-5 bg-dark">
+    <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Boris <br>boshl@dfds.com</p>
+    </div>
+    <!-- /.container -->
+
+
+
+</footer>
+
+
+
+
+
+<!-- Modal Add Trailer -->
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+</body>
+
+
+
+<div class="modal fade" id="exampleModalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelAdd" aria-hidden="true" data-backdrop="false" >
+    <div class="modal-dialog" role="document" id="modalAdd">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabelAdd">Add new user</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form class="form" id="addform" method="post" action="/user/add">
+
+                    <div class="form-group row">
+                        <label for="trailer" class="col-sm-3 col-form-label" >Username</label>
+                        <div class="col-sm-4">
+                            <input pattern="[A-Za-z0-9]+" id="trailer" class="form-control-sm" name="username" type="text" placeholder="Username"  required  >
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="form-group row">
+                        <label for="truck" class="col-sm-3 col-form-label">Password</label>
+                        <div class="col-sm-4">
+                            <input pattern="[A-Za-z0-9]+" id="truck" class="form-control-sm" name="password"  type="text" placeholder="Password" required >
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group row">
+                        <label for="department" class="col-sm-3 col-form-label">Role</label>
+                        <div class="col-sm-4">
+                            <select id="department" class="form-control-sm" name="role" required >
+                                <option></option>
+                                <option>User</option>
+                                <option>Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+
+
+                    <button type="submit" class="btn btn-primary"  >Save changes</button>
+
+
+                    <br>
+                    <br>
+
+
+                    <div class="modal-footer">
+                        <div class="form-group row">
+                            <div class="col-sm-2"></div>
+
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+<script>
+
+    // Button Add Departure pass
+
+    // Button Edit Arrival pass
+
+
+
+
+
+    //Test
+
+
+
+
+
+
+
+</script>
+
+
+</html>
